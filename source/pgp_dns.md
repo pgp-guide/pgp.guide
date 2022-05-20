@@ -182,17 +182,22 @@ Most of the tests we're going to do for these are essentially the same activity.
 
 A simple dig:
 
-%dig +short danm._pka.prime.gushi.org. TXT
+```
+dig +short danm._pka.prime.gushi.org. TXT
 "v=pka1\;fpr=C2063054549295F3349037FFFBBE5A30624BB249\;uri=http://prime.gushi.org/danm.pubkey.txt"
+```
 (The backslashes before the semicolons are normal). Other than that, it seems to make sense and match what I put in.)
 
 Test it with GPG. Rather than messing around with, and adding-from and deleting from live keyrings, you can do:
 
-%echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate pka -r you@you.com
+```
+echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate pka -r you@you.com
+```
 (where you@you.com is the address of your primary key.)
 
 The /tmp/gpg-$$ creates a random file named after your PID. What you should see, and what I see, is something like this:
 
+```
 gpg: WARNING: using insecure memory!
 gpg: please see http://www.gnupg.org/faq.html for more information
 gpg: keyring `/tmp/gpg-39996' created
@@ -206,18 +211,18 @@ gpg:               imported: 1
 gpg: automatically retrieved `danm@prime.gushi.org' via PKA
 gpg: DE20C529: There is no assurance this key belongs to the named user
 
-
 pub  2048g/DE20C529 2000-10-02 Daniel P. Mahoney <danm@prime.gushi.org>
 Primary key fingerprint: C206 3054 5492 95F3 3490  37FF FBBE 5A30 624B B249
      Subkey fingerprint: CE40 B786 81E2 5CB9 F7D3  1318 9488 EB58 DE20 C529
-
 
 It is NOT certain that the key belongs to the person named
 in the user ID.  If you *really* know what you are doing,
 you may answer the next question with yes.
 
-
 Use this key anyway? (y/N) y
+```
+
+```
 -----BEGIN PGP MESSAGE-----
 Version: GnuPG v1.4.10 (FreeBSD)
 
@@ -236,6 +241,9 @@ trKFeqkmKemrq2GvMNyJyrEOB8e7KgbmXa95YKH0Wh2D4SWpXukegyCspmY4tDE+
 uckaFSao+48g8D6vs1irGSxBRjyhD/jPDblrgpo=
 =NbgW
 -----END PGP MESSAGE-----
+```
+
+
 %
 The "insecure memory" warning is a silly warning that the only way to turn off is to run GPG setuid root.
 
