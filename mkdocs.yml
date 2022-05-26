@@ -1,7 +1,7 @@
 site_name: Pretty Good Privacy Guide
 site_url: https://www.pgp.guide
 repo_url: https://github.com/pgp-guide/pgp.guide
-docs_dir: source
+docs_dir: sources
 site_dir: docs
 
 theme:
