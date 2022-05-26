@@ -59,7 +59,8 @@ Using some of these methods, DNS is just a means to an end: you still need to pu
 
 Initial verifications of most of these seem to imply that only DSA keys are supported, although I welcome feedback. It seems the community is trying to get RSA keys to make a comeback. They're the only type supported by the gpg2.0 card, and they are the default keytype. There was a while where they weren't, though. Since writing this document, I've discovered that "new" RSA keys work, but ancient RSA keys with no subkeys tend to misbehave.
 
-### Turning on key-fetching via DNS
+# Turning on key-fetching via DNS
+<hr>
 
 Inside your GPG "options" file, find the "auto-key-locate" line, and add "cert" and/or "pka" to the options.
 
@@ -82,14 +83,15 @@ pka-trust-increase
     pka-lookups is set.
 You can also use the same options on the command line (as you'll see in this document).
 
-## Types of PGP Key Records
-
-### DNS PKA Records
+# Types of PGP Key Records
+<hr>
+## DNS PKA Records
 
 Relevant RFCs: None that I can find.
+
 Other Docs: The GPG source and mailing lists.
 
-#### Advantages
+### Advantages
 
 It's a TXT record. Easy to put in a zonefile with most management software.
 
@@ -99,13 +101,13 @@ Since it uses a special subzone, you can manage the _pka namespace in a separate
 
 GPG has an option, when verifying a signature, to look up these records (--verify-options pka-lookups), so it's doubly useful, both from a distribution and a verification point.
 
-#### Disadvantages
+### Disadvantages
 
 As with IPGP certs, you're at the mercy of the URL. This doesn't put your key in DNS, just the location of it, and the fingerprint. Some clients may not be able to support https or http 1.1.
 
 Not RFC standard.
 
-#### Howto
+## Howto
 
 Figure out which key you want to export:
 
@@ -244,7 +246,6 @@ uckaFSao+48g8D6vs1irGSxBRjyhD/jPDblrgpo=
 ```
 
 
-%
 The "insecure memory" warning is a silly warning that the only way to turn off is to run GPG setuid root.
 
 You can see in the output that the key comes from PKA.
@@ -278,7 +279,8 @@ Make-dns-cert currently generates a very ugly record for this.
 
 As before, the first step is to figure out which key we want.
 
-%gpg --list-keys danm@prime.gushi.org
+```
+gpg --list-keys danm@prime.gushi.org
 Warning: using insecure memory!
 pub   1024D/624BB249 2000-10-02  <-- I'm going to use this one.
 uid                  Daniel P. Mahoney <danm@prime.gushi.org>
@@ -289,20 +291,24 @@ sub   2048g/DE20C529 2000-10-02
 pub   1024R/309C17C5 1997-05-08
 uid                  Daniel P. Mahoney <danm@prime.gushi.org>
 We export the key, but this time, it needs to be binary.
-
-%gpg --export 624BB249 > 624BB249.pub.bin
+```
+```
+gpg --export 624BB249 > 624BB249.pub.bin
 Warning: using insecure memory!
-%
+```
 We run make-dns-cert on it. make-dns-cert comes with no manual or docs, but running with -h gives you all the clue you need.
 
+```
 make-dns-cert
     -f      fingerprint
     -u      URL
     -k      key file
     -n      DNS name
 So then, make-dns-cert -n danm.prime.gushi.org. -k 624BB249.pub.bin
+```
 
-$```make-dns-cert -n danm.prime.gushi.org. -k 624BB249.pub.bin
+```
+make-dns-cert -n danm.prime.gushi.org. -k 624BB249.pub.bin
 ```
 
 ```
@@ -342,12 +348,16 @@ The rest of the record is on one line. I wrapped it for the purposes of brevity.
 
 So the thing is ugly and you don't want to touch it. The easiest way to work with it is to drop all that into a file:
 
-$```make-dns-cert -n danm.prime.gushi.org. -k 624BB249.pub.bin > 624BB249.big.cert
+```
+make-dns-cert -n danm.prime.gushi.org. -k 624BB249.pub.bin > 624BB249.big.cert
 ```
 
 And then either read it into your editor, or tack it on like this:
 
-%cat 624BB249.big.cert >> your.zonefile
+```
+cat 624BB249.big.cert >> your.zonefile
+```
+
 Be sure to make a backup first. Either way, you never have to copy/paste the raw hex and worry about newlines being inserted where you don't want them.
 
 Before you reload your zone, you might want to use named-checkzone on it first:
@@ -367,7 +377,7 @@ If it looks okay, bump your serial number and reload.
 
 As above, you can dig, but you won't be able to easily read the results:
 
-$```
+```
 dig +short danm.prime.gushi.org CERT
 ```
 
@@ -395,7 +405,7 @@ It's still ugly, but it's not AS ugly because it's base64, which includes spaces
 You can run your existing exported key through a base64 converter, like the one built into the openssl binary, if you want to compare:
 
 ```
-%cat 624BB249.pub.bin | openssl enc -base64
+cat 624BB249.pub.bin | openssl enc -base64
 ```
 ```
 mQGiBDnY2vERBAD3cOxqoAYHYzS+xttvuyN9wZS8CrgwLIlT8Ewo/CCFI11PEO+g
@@ -415,10 +425,10 @@ Testing with gpg
 As above, the command to test this is remarkably simple:
 
 ```
-%rm /tmp/gpg-*
+rm /tmp/gpg-*
 ```
 ```
-%echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate cert -r danm@prime.gushi.org
+echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate cert -r danm@prime.gushi.org
 ```
 
 ```
@@ -462,7 +472,7 @@ uMkaeeB5Mv7ssDQ9kPhO989CHFcznrE1lgOxjX8=
 =NTLY
 -----END PGP MESSAGE-----
 ```
-%
+
 Okay, as above, try to decrypt that with your private key.
 
 ### IPGP CERT Records
@@ -492,16 +502,20 @@ Despite being RFC compliant, GPG has additional trust vectors for PKA but not th
 
 Harder to verify with dig.
 
-### Howto
+## How to
+
+<H3>
+<span style="color:red">
+Note that some of these steps are redundant. If you're already doing a PKA key, skip to step 5.
+</span>
+</H3>
+
+
+
+##### Dig:
 
 ```
-1. Note that some of these steps are redundant. If you're already doing a PKA key, skip to step 5.
-```
-
-```
-2. Dig:
-
-%gpg --list-keys danm@prime.gushi.org
+gpg --list-keys danm@prime.gushi.org
 Warning: using insecure memory!
 pub   1024D/624BB249 2000-10-02  <-- I'm going to use this one.
 uid                  Daniel P. Mahoney <danm@prime.gushi.org>
@@ -513,18 +527,18 @@ pub   1024R/309C17C5 1997-05-08
 uid                  Daniel P. Mahoney <danm@prime.gushi.org>
 ```
 
-```
-3. Export the key to a file (I use keyid.pub.asc, but it can be anything)
+##### Export the key to a file (I use keyid.pub.asc, but it can be anything)
 
-%gpg --export --armor 624BB249 > 624BB249.pub.asc
+```
+gpg --export --armor 624BB249 > 624BB249.pub.asc
 Warning: using insecure memory!
-%
 ```
 
-```
-4. Get the fingerprint for your key:
 
-%gpg --list-keys --fingerprint 624BB249
+##### Get the fingerprint for your key:
+
+```
+gpg --list-keys --fingerprint 624BB249
 
 gpg: WARNING: using insecure memory!
 gpg: please see http://www.gnupg.org/faq.html for more information
@@ -535,37 +549,42 @@ uid                  Daniel Mahoney (Secondary Email) <gushi@gushi.org>
 sub   2048g/DE20C529 2000-10-02
 ```
 
-```
-5. As above, run make-dns-cert. This time we use the -n, -f, and -u options:
+##### As above, run make-dns-cert. This time we use the -n, -f, and -u options:
 
-%make-dns-cert -n danm.prime.gushi.org. -f C2063054549295F3349037FFFBBE5A30624BB249 -u http://prime.gushi.org/danm.pubkey.txt
+```
+make-dns-cert -n danm.prime.gushi.org. -f C2063054549295F3349037FFFBBE5A30624BB249 -u http://prime.gushi.org/danm.pubkey.txt
 danm.prime.gushi.org.   TYPE37  \# 64 0006 0000 00 14 C2063054549295F3349037FFFBBE5A30624BB249
 687474703A2F2F7072696D652E67757368692E6F72672F64616E6D2E7075626B65792E747874
-%
+
 ```
-```
-6. Put the above in DNS. All on one line. Optionally add a TTL.
-```
-```
-7. IMPORTANT: make sure you don't have any other CERT records with the same label (i.e. a "big" cert, as above). While it won't break things, you have no control over which (of multiple) people will get.
-```
-```
-8. Reload your zone, and test. Testing will probably look VERY MUCH like the above, but here are the steps anyway:
-```
+
+##### Put the above in DNS. All on one line. Optionally add a TTL.
+
+
+#### IMPORTANT: make sure you don't have any other CERT records with the same label (i.e. a "big" cert, as above). While it won't break things, you have no control over which (of multiple) people will get.
+
+
+
+#### Reload your zone, and test. Testing will probably look VERY MUCH like the above, but here are the steps anyway:
+
 ### Testing
 
-```
-1. Dig:
 
-%dig +short danm.prime.gushi.org CERT
+##### Dig:
+
+```
+dig +short danm.prime.gushi.org CERT
+```
+```
 6 0 0 FMIGMFRUkpXzNJA3//u+WjBiS7JJaHR0cDovL3ByaW1lLmd1c2hpLm9y Zy9kYW5tLnB1YmtleS50eHQ=
 Sadly, I haven't come across an easy way to decipher it yet, but there's always gpg.
 ```
-```
-2. GPG:
+
+##### GPG:
 
 Since we're fetching the same kind of record, the command is exactly the same as before:
 
+```
 %echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate cert -r  danm@prime.gushi.org
 gpg: WARNING: using insecure memory!
 gpg: please see http://www.gnupg.org/faq.html for more information
@@ -592,6 +611,8 @@ you may answer the next question with yes.
 
 
 Use this key anyway? (y/N) y
+```
+```
 -----BEGIN PGP MESSAGE-----
 Version: GnuPG v1.4.10 (FreeBSD)
 
@@ -610,14 +631,14 @@ fF3KopX+V82X1oE2QuGdFfd8mK57ZXJL3VRUrfohQjhfYNKzougiP46rQQv79MYT
 j8kazWyJUuufm6NVco1/35Zdp1UhHu8qTgXxrjo=
 =zY9G
 -----END PGP MESSAGE-----
-%
 ```
 Strangely, the output doesn't say what PKA does (a PKA retrieval has a line about fetching via HTTP), however, by checking my webserver logs, I can see it retrieved it from there:
 
 ```
-%tail -200 /usr/local/apache/logs/prime.gushi.org.log | grep pubkey | tail -1
+tail -200 /usr/local/apache/logs/prime.gushi.org.log | grep pubkey | tail -1
+```
+```
 prime.gushi.org 72.9.101.130 - - [28/Oct/2009:23:50:43 -0400] "GET /danm.pubkey.txt HTTP/1.1" 200 4337 "-" "-"
-%
 ```
 As usual, test decryption, etc. You're done.
 
@@ -680,18 +701,21 @@ It doesn't do any actual cryptography, just some binary conversion, so in theory
 I've made the argument to the GPG developers that if multiple CERT records are available, all should be tried if one fails. So far, if multiple exist, only the first received is parsed, and of course, DNS round-robins the answers by default.
 
 It took me quite a lot of trial and error to realize that there's a difference between "modern" RSA keys, like this:
-
-    %gpg --list-keys --fingerprint gushi@prime.gushi.org
+```
+    gpg --list-keys --fingerprint gushi@prime.gushi.org
     pub   2048R/CF45887D 2009-10-29
           Key fingerprint = FCB0 485E 050D DDFA 83C6  76E3 E722 3C05 CF45 887D
     uid                  Gushi Test <gushi@prime.gushi.org>
     sub   2048R/C9761244 2009-10-29
 and ancient RSA keys like this pgp2.6.2 monster:
-
-    %gpg --list-keys --fingerprint danm@prime.gushi.org
+```
+```
+    gpg --list-keys --fingerprint danm@prime.gushi.org
     pub   1024R/309C17C5 1997-05-08
            Key fingerprint = 04 4B 1A 2E C4 62 95 73  73 A4 EA D0 08 A4 45 76
     uid                  Daniel P. Mahoney <danm@prime.gushi.org>
+```
+
 Note the lack of a subkey there. Note the weird fingerprint. I have not been able to get this key to properly export with gpg. If someone knows the Deep Magic, let me know.
 
 ### References
