@@ -1,0 +1,20 @@
+current directory: /Users/git/pgp.guide/source/openpgp.org/vendor/bundle/ruby/2.6.0/gems/json-1.8.3/ext/json/ext/generator
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby -I /Library/Ruby/Site/2.6.0 -r ./siteconf20220509-13738-e7ekin.rb extconf.rb
+creating Makefile
+
+current directory: /Users/git/pgp.guide/source/openpgp.org/vendor/bundle/ruby/2.6.0/gems/json-1.8.3/ext/json/ext/generator
+make DESTDIR\= clean
+
+current directory: /Users/git/pgp.guide/source/openpgp.org/vendor/bundle/ruby/2.6.0/gems/json-1.8.3/ext/json/ext/generator
+make DESTDIR\=
+compiling generator.c
+generator.c:861:25: error: use of undeclared identifier 'rb_cFixnum'
+    } else if (klass == rb_cFixnum) {
+                        ^
+generator.c:863:25: error: use of undeclared identifier 'rb_cBignum'
+    } else if (klass == rb_cBignum) {
+                        ^
+2 errors generated.
+make: *** [generator.o] Error 1
+
+make failed, exit code 2
