@@ -72,6 +72,7 @@ help:
 
 init:
 	python3 -m pip install -r requirements.txt
+docs: build
 build:
 	mkdocs build
 serve: build
