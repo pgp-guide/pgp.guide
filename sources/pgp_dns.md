@@ -112,51 +112,81 @@ Not RFC standard.
 Figure out which key you want to export:
 
 ```
-gpg --list-keys danm@prime.gushi.org
-Warning: using insecure memory!
-pub   1024D/624BB249 2000-10-02  <-- I'm going to use this one.
-uid                  Daniel P. Mahoney <danm@prime.gushi.org>
-uid                  Daniel Mahoney (Secondary Email) <gushi@gushi.org>
-sub   2048g/DE20C529 2000-10-02
+$ gpg --list-keys randymcmillan
+```
+```
+pub   rsa4096 2017-06-29 [SC] [expires: 2033-06-25]
+      EE29B7B017F19DDA7C565A55AB2017A2CA7FD790
+uid           [ultimate] randy mcmillan <randy.lee.mcmillan@gmail.com>
+sub   rsa4096 2017-06-29 [E] [expires: 2033-06-25]
 
-pub   1024R/309C17C5 1997-05-08
-uid                  Daniel P. Mahoney <danm@prime.gushi.org>
+pub   rsa4096 2019-03-13 [SC]
+      E616FA7221A1613E5B99206297966C06BB06757B
+uid           [ultimate] Randy McMillan (github.com/randymcmillan) <randy.lee.mcmillan@gmail.com>
+uid           [ultimate] admin@bitcoincore.dev <admin@bitcoincore.dev>
+uid           [ultimate] randymcmillan@protonmail.com <randymcmillan@protonmail.com>
+uid           [ultimate] randymcmillan@pm.me <randymcmillan@pm.me>
+uid           [ultimate] [jpeg image of size 6741]
+uid           [ultimate] admin@timechain.academy <admin@timechain.academy>
+sub   rsa4096 2020-05-25 [E]
+sub   elg4096 2022-01-12 [E]
+sub   rsa4096 2022-01-12 [S]
+sub   dsa3072 2022-01-12 [S]
+sub   rsa4096 2022-01-21 [E]
+
+pub   rsa4096 2022-03-21 [SC]
+      D861F4DC1F4A61A2F694E9FAC1F7CD09865B2381
+uid           [ultimate] Randy McMillan (0x20bf.org) <randy.lee.mcmillan@gmail.com>
+uid           [ultimate] admin@0x20bf.org <admin@0x20bf.org>
+uid           [ultimate] [jpeg image of size 6741]
+sub   rsa4096 2022-03-21 [E]
+sub   elg4096 2022-03-21 [E]
+sub   rsa4096 2022-03-21 [S]
+sub   dsa3072 2022-03-21 [S]
 ```
 
-Export the key to a file (I use keyid.pub.asc, but it can be anything)
+### Export the key to a file (I use BB06757B.pub.asc, but it can be anything)
 
 ```
-gpg --export --armor 624BB249 > 624BB249.pub.asc
-Warning: using insecure memory!
+gpg --export --armor BB06757B > BB06757B.pub.asc
 ```
 
-Get the fingerprint for your key:
+### Get the fingerprint for your key:
 
 ```
-gpg --list-keys --fingerprint 624BB249
+gpg --list-keys --fingerprint BB06757B
 ```
-
 ```
-gpg: WARNING: using insecure memory!
-gpg: please see http://www.gnupg.org/faq.html for more information
-pub   1024D/624BB249 2000-10-02
-      Key fingerprint = C206 3054 5492 95F3 3490  37FF FBBE 5A30 624B B249 <-- That bit is your fingerprint.
-uid                  Daniel P. Mahoney <danm@prime.gushi.org>
-uid                  Daniel Mahoney (Secondary Email) <gushi@gushi.org>
-sub   2048g/DE20C529 2000-10-02
+pub   rsa4096 2019-03-13 [SC]
+      E616 FA72 21A1 613E 5B99  2062 9796 6C06 BB06 757B
+uid           [ultimate] Randy McMillan (github.com/randymcmillan) <randy.lee.mcmillan@gmail.com>
+uid           [ultimate] admin@bitcoincore.dev <admin@bitcoincore.dev>
+uid           [ultimate] randymcmillan@protonmail.com <randymcmillan@protonmail.com>
+uid           [ultimate] randymcmillan@pm.me <randymcmillan@pm.me>
+uid           [ultimate] [jpeg image of size 6741]
+uid           [ultimate] admin@timechain.academy <admin@timechain.academy>
+sub   rsa4096 2020-05-25 [E]
+sub   elg4096 2022-01-12 [E]
+sub   rsa4096 2022-01-12 [S]
+sub   dsa3072 2022-01-12 [S]
+sub   rsa4096 2022-01-21 [E]
 ```
 
 Copy the file somewhere, like your webspace. It need not live on the same server. It needs to be accessable by the url you create in the next step.
 
 ```
-cp 624BB249.pub.asc public_html/danm.pubkey.txt
+cp BB06757B.pub.asc BB06757B.pub.asc.txt
 ```
 
 Make up your text record. The format is:
 
 ```
-danm._pka.prime.gushi.org.  TXT
-"v=pka1;fpr=C2063054549295F3349037FFFBBE5A30624BB249;uri=http://prime.gushi.org/danm.pubkey.txt"
+@ 10800 IN OPENPGPKEY BB06757B
+@ 10800 IN OPENPGPKEY E616FA7221A1613E5B99206297966C06BB06757B
+@ 10800 IN TXT "E616FA7221A1613E5B99206297966C06BB06757B"
+_pka 10800 IN TXT "v=pka1;fpr=BB06757B.pub.asc.txt\;uri=https://pgp.guide/BB06757B.pub.asc.txt"
+admin._pka 10800 IN OPENPGPKEY E616FA7221A1613E5B99206297966C06 BB06757B
+admin._pka 10800 IN TXT "v=pka1;fpr=BB06757B.pub.asc.txt\;uri=https://pgp.guide/BB06757B.pub.asc.txt"
 ```
 
 We'll take this in several parts.
@@ -164,14 +194,20 @@ We'll take this in several parts.
 The record label is simply the email address with "._pka." replacing the "@".
 
 ```
-danm@prime.gushi.org becomes danm._pka.prime.gushi.org.
+admin@pgp.guide
 ```
 
-<span style="color:red">
+###### becomes
+
+```
+admin._pka.pgp.guide
+```
+
+<center><span style="color:red">
 *Don't forget the trailing dot, if you're using the fully qualified name.*
 </br>
 *I recommend sticking with fully-qualified, for simplicity.*
-</span>
+</span></center>
 
 
 The body of the record is also simple. The v portion is just a version. There's only one version as far as I can tell, 'pka1'. The fpr is the fingerprint, with all whitespace stripped, and in uppercase. The uri is the location a key can be retrieved from. All the "names" are lowercase, separated by semicolons.
@@ -185,15 +221,27 @@ Most of the tests we're going to do for these are essentially the same activity.
 A simple dig:
 
 ```
-dig +short danm._pka.prime.gushi.org. TXT
-"v=pka1\;fpr=C2063054549295F3349037FFFBBE5A30624BB249\;uri=http://prime.gushi.org/danm.pubkey.txt"
+dig +noall +answer +multiline pgp.guide any
+dig +noall +answer +multiline  _pka.pgp.guide any 
+dig +noall +answer +multiline  admin._pka.pgp.guide any
+```
+```
+dig +short pgp.guide any
+dig +short _pka.pgp.guide any
+dig +short admin._pka.pgp.guide any
+
+
+```
+
+```
+dig +short admin._pka.pgp.guide. TXT "v=pka1\;fpr=BB06757B\;uri=https://pgp.guide/BB06757B.pub.asc.txt"
 ```
 (The backslashes before the semicolons are normal). Other than that, it seems to make sense and match what I put in.)
 
 Test it with GPG. Rather than messing around with, and adding-from and deleting from live keyrings, you can do:
 
 ```
-echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate pka -r you@you.com
+echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate pka -r admin@pgp.guide
 ```
 (where you@you.com is the address of your primary key.)
 
@@ -585,7 +633,7 @@ Sadly, I haven't come across an easy way to decipher it yet, but there's always 
 Since we're fetching the same kind of record, the command is exactly the same as before:
 
 ```
-%echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate cert -r  danm@prime.gushi.org
+echo "foo" | gpg --no-default-keyring --keyring /tmp/gpg-$$ --encrypt --armor --auto-key-locate cert -r  danm@prime.gushi.org
 gpg: WARNING: using insecure memory!
 gpg: please see http://www.gnupg.org/faq.html for more information
 gpg: keyring `/tmp/gpg-39996' created
@@ -702,18 +750,18 @@ I've made the argument to the GPG developers that if multiple CERT records are a
 
 It took me quite a lot of trial and error to realize that there's a difference between "modern" RSA keys, like this:
 ```
-    gpg --list-keys --fingerprint gushi@prime.gushi.org
-    pub   2048R/CF45887D 2009-10-29
-          Key fingerprint = FCB0 485E 050D DDFA 83C6  76E3 E722 3C05 CF45 887D
-    uid                  Gushi Test <gushi@prime.gushi.org>
-    sub   2048R/C9761244 2009-10-29
+gpg --list-keys --fingerprint gushi@prime.gushi.org
+pub   2048R/CF45887D 2009-10-29
+      Key fingerprint = FCB0 485E 050D DDFA 83C6  76E3 E722 3C05 CF45 887D
+uid                  Gushi Test <gushi@prime.gushi.org>
+sub   2048R/C9761244 2009-10-29
 and ancient RSA keys like this pgp2.6.2 monster:
 ```
 ```
-    gpg --list-keys --fingerprint danm@prime.gushi.org
-    pub   1024R/309C17C5 1997-05-08
-           Key fingerprint = 04 4B 1A 2E C4 62 95 73  73 A4 EA D0 08 A4 45 76
-    uid                  Daniel P. Mahoney <danm@prime.gushi.org>
+gpg --list-keys --fingerprint danm@prime.gushi.org
+pub   1024R/309C17C5 1997-05-08
+       Key fingerprint = 04 4B 1A 2E C4 62 95 73  73 A4 EA D0 08 A4 45 76
+uid                  Daniel P. Mahoney <danm@prime.gushi.org>
 ```
 
 Note the lack of a subkey there. Note the weird fingerprint. I have not been able to get this key to properly export with gpg. If someone knows the Deep Magic, let me know.
@@ -760,10 +808,6 @@ This document was written in gnu nano, and HTML was generated using Markdown.
 
 Markdown rocks.
 
-Originally published on my livejournal at http://gushi.livejournal.com/524199.html, its main home is at http://www.gushi.org/make-dns-cert/HOWTO.html, which is where later versions will be published.
+Originally published on my livejournal at [link](http://gushi.livejournal.com/524199.html), its main home is at [link](http://www.gushi.org/make-dns-cert/HOWTO.html), which is where later versions will be published.
 
 Free to use, comments to the above email address are welcome.
-
-$Id: HOWTO.txt,v 1.6 2010/05/19 20:14:49 danm Exp $
-
-Valid XHTML 1.0 Strict
