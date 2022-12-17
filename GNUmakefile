@@ -103,11 +103,13 @@ export GIT_REPO_PATH
 ##		test:		test
 ##			test:			test
 ##				test:				test
-help:
-	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/	/'
+help:## help
+	#@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/	/'
+	#NOTE: 2 hashes are detected as 1st column output with color
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?##/ {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 .PHONY: report
-report:## 	report
+report:## report
 	@echo ''
 	@echo '	[ARGUMENTS]	'
 	@echo '      args:'
@@ -137,20 +139,18 @@ report:## 	report
 	@echo '        - GIT_REPO_NAME=${GIT_REPO_NAME}'
 	@echo '        - GIT_REPO_PATH=${GIT_REPO_PATH}'
 
-
-
-init:
+init:## init
 	python3 -m pip install -r requirements.txt
-docs: build
-build:
+docs: build## docs
+build:## build
 	mkdocs build
-serve: build
+serve: build## serve
 	mkdocs serve & open http://127.0.0.1:$(PORT) || open http://127.0.0.1:$(PORT)
 	#$(PYTHON3) -m http.server $(PORT) --bind 127.0.0.1 -d $(PWD)/docs > /dev/null 2>&1 || open http://127.0.0.1:$(PORT)
 
 git-add:
 
-push:
+push:## push
 	@echo 'push'
 	#bash -c "git reset --soft HEAD~1 || echo failed to add docs..."
 	#bash -c "git add README.md docker/README.md docker/DOCKER.md *.md docker/*.md || echo failed to add docs..."
@@ -162,6 +162,6 @@ push:
 SIGNIN=randymcmillan
 export SIGNIN
 
-signin:
+signin:## signin
 #Place a file named GH_TOKEN.txt in your $HOME - create in https://github.com/settings/tokens (Personal access tokens)
 	bash -c 'cat ~/GH_TOKEN.txt | docker login ghcr.io -u $(GIT_PROFILE) --password-stdin'
