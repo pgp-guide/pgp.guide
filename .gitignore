@@ -5,3 +5,6 @@ Gemfile.lock
 docs/openpgp.org
 source/openpgp.org/.bundle/
 source/openpgp.org/vendor/
+
+.DS_Store
+sources/.DS_Store
